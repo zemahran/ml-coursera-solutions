@@ -45,7 +45,10 @@ fprintf('   [ 7.119387 3.616684 ])\n\n');
 %  After we have completed the two functions computeCentroids and
 %  findClosestCentroids, we have all the necessary pieces to run the
 %  kMeans algorithm. In this part, we will run the K-Means algorithm on
-%  our example dataset.
+%  our example dataset. Note that this can also be done automatically using
+%  MATLAB's kmeans(X, K) function. But in this case, we dont have to
+%  intialize centroids. The function does all the work and returns the
+%  final computed centroids as well the indices clusters in idx.
 %
 %%
 fprintf('\nRunning K-Means clustering on example dataset.\n\n');
@@ -59,6 +62,10 @@ initial_centroids = [1 8; 8 1; 7 7];
 
 % Run K-Means algorithm & plot progress
 [centroids, idx] = runkMeans(X, initial_centroids, max_iters, true);
+
+% to achieve the same using MATLAB's kmeans function:
+% [idx, centroids] = kmeans(X, K)
+
 fprintf('\nK-Means Done.\n\n');
 %% ============= Part 4: K-Means Clustering on Pixels ===============
 %%
@@ -101,24 +108,22 @@ initial_centroids = kMeansInitCentroids(X, K);
 %  to our final computed centroids.
 %
 %%
-fprintf('\nApplying K-Means to compress an image.\n\n');
-% Find closest cluster members
+fprintf('\nApplying K-Means to compress the image.\n\n');
+% Find closest cluster members - one more step
 idx = findClosestCentroids(X, centroids);
 
-% now we have represented the image X in terms of the values in idx
-% We can now recover the image from the indices (idx) by mapping each pixel
+% now that we have represented the image X in terms of the values in idx,
+% we can now recover the image from the indices (idx) by mapping each pixel
 % (specified by its index in idx) to the centroid value
 X_recovered = centroids(idx,:);
 
 % Reshape the recovered image into proper dimensions (r,g,b)
 X_recovered = reshape(X_recovered, img_size(1), img_size(2), 3);
 
-% Display the original image 
+% Display the original & compressed images side-by-side
 subplot(1, 2, 1);
 imagesc(A); 
 title('Original');
-
-% Display both images side by side
 subplot(1, 2, 2);
 imagesc(X_recovered)
 title(sprintf('Compressed with %d colors.', K));
